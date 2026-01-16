@@ -28,7 +28,7 @@ const App: React.FC = () => {
     tripDuration: '-',
     unloadingDate: getToday(), // Default tanggal sekarang
     unloadingTime: '05.00',
-    unloadingLocation: LokasiBongkar.TPI_Tegalsari, // Default lokasi bongkar yang umum
+    unloadingLocation: LokasiBongkar.DermagaBaru,
     dailyReports: [
       { cumi: 0, sotong: 0, ikan: 0, gurita: 0, buyer: '', enumerator: '', status: 'lanjut' }
     ],
@@ -68,14 +68,14 @@ const App: React.FC = () => {
     if (!pastedText.trim()) return;
     const parsedData = parseReportText(pastedText);
     if (parsedData) {
-      // Selalu pastikan Tgl Bongkar adalah hari ini jika diinginkan, 
-      // tapi biasanya paste mengikuti data lama. Namun user meminta "otomatis sekarang".
-      // Kita prioritaskan hari ini jika parsing tidak menemukan tanggal yang valid atau tetap overwrite.
-      setData(prev => ({ 
-        ...prev, 
-        ...parsedData as ReportData,
-        unloadingDate: (parsedData as ReportData).unloadingDate || getToday()
-      }));
+      // Sesuai permintaan: Paksa Tanggal Bongkar ke hari ini meskipun data lama di-paste
+      const finalData = {
+        ...parsedData,
+        unloadingDate: getToday(),
+        reportDate: getToday() // Biasanya tanggal laporan juga ingin yang terbaru
+      };
+      
+      setData(prev => ({ ...prev, ...finalData as ReportData }));
       setPasteFeedback('Data berhasil diterapkan!');
       setPastedText('');
       setTimeout(() => setPasteFeedback(null), 3000);
@@ -94,12 +94,14 @@ const App: React.FC = () => {
     });
   };
 
-  const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement>, limit: number = 10) => {
+  // Fix: Update type to handle combined Input/Select/Textarea event to match the Input component's props
+  const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>, limit: number = 10) => {
     const val = e.target.value.replace(/[^0-9]/g, '').slice(0, limit);
     return val;
   };
 
-  const handleTimeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Fix: Update type to handle combined Input/Select/Textarea event to match the Input component's props
+  const handleTimeInput = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const val = e.target.value.replace(/[^0-9.]/g, '').slice(0, 5);
     return val;
   };
@@ -121,10 +123,10 @@ const App: React.FC = () => {
             <h2 className="text-sm font-bold text-indigo-900 flex items-center gap-2 uppercase tracking-wider">
               ✨ Smart Paste (Isi Otomatis)
             </h2>
-            <p className="text-xs text-indigo-700">Tempelkan teks laporan sebelumnya di bawah ini untuk mengisi formulir secara otomatis.</p>
+            <p className="text-xs text-indigo-700">Tempelkan teks laporan sebelumnya di sini. Lokasi dan Tanggal akan disesuaikan otomatis.</p>
             <textarea 
               className="w-full h-24 p-3 text-xs font-mono rounded-lg border-indigo-200 border bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              placeholder="Tempel laporan di sini..."
+              placeholder="Tempel laporan lama di sini..."
               value={pastedText}
               onChange={(e) => setPastedText(e.target.value)}
             />
@@ -178,7 +180,7 @@ const App: React.FC = () => {
             />
             
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-semibold text-gray-600 uppercase">Tanda Selar</label>
+              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Tanda Selar</label>
               <div className="grid grid-cols-3 gap-2">
                 <Input 
                   label="GT" 
@@ -354,7 +356,7 @@ const App: React.FC = () => {
           </div>
           <div className="mt-4 p-4 bg-yellow-50 border border-yellow-100 rounded-lg">
              <p className="text-xs text-yellow-800">
-               <strong>Tips:</strong> Gunakan status (lanjut/selesai) untuk menandai progres bongkaran. Lokasi Bongkar sekarang lebih fleksibel dan Nama Enumerator akan terbaca meskipun diisi tanda hubung (-).
+               <strong>Note:</strong> Tanggal Bongkar sekarang otomatis diatur ke hari ini setiap kali Anda memulai atau menggunakan Smart Paste. Lokasi Bongkar telah diperbarui ke daftar Dermaga PPP Tegalsari yang benar.
              </p>
           </div>
         </div>

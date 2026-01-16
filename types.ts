@@ -7,10 +7,10 @@ export enum AlatTangkap {
 }
 
 export enum LokasiBongkar {
-  DermagaJongor = 'Dermaga Jongor',
-  PPP_Tegalsari = 'PPP Tegalsari',
-  TPI_Tegalsari = 'TPI Tegalsari',
-  KolamPelabuhan = 'Kolam Pelabuhan'
+  DermagaBaru = 'Dermaga Baru',
+  DermagaEkorKuning = 'Dermaga Ekor Kuning',
+  DermagaDepanTPI = 'Dermaga Depan TPI',
+  DermagaJongor = 'Dermaga Jongor'
 }
 
 export enum ReportType {
@@ -47,7 +47,7 @@ export interface ReportData {
   tripDuration: string;
   unloadingDate: string;
   unloadingTime: string;
-  unloadingLocation: string; // Diubah menjadi string agar fleksibel
+  unloadingLocation: string;
   dailyReports: WeighingData[];
   dominantFish: string;
   notes: string;
